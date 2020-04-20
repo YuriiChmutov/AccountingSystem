@@ -1,11 +1,12 @@
 ﻿using AccountingNotebook.Abstractions;
+using AccountingNotebook.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AccountingNotebook.Models
+namespace AccountingNotebook.Service.ITransactionServiceFolder
 {
-    public class TransactionsHistory: IRepository<Transaction>
+    public class TransactionsHistory: ITransactionHistoryService<Transaction>
     {
         private readonly List<Transaction> transactions = new List<Transaction>();
 

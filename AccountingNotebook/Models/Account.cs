@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AccountingNotebook.Service.ITransactionServiceFolder;
+using System;
 
 namespace AccountingNotebook.Models
 {

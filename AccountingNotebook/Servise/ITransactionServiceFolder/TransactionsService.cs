@@ -3,7 +3,7 @@ using AccountingNotebook.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace AccountingNotebook.BusinessLogic
+namespace AccountingNotebook.Service.ITransactionServiceFolder
 {
     public class TransactionsService: ITransactionService
     {        

@@ -1,6 +1,6 @@
 ﻿using AccountingNotebook.Abstractions;
-using AccountingNotebook.BusinessLogic;
 using AccountingNotebook.Controllers;
+using AccountingNotebook.Service.ITransactionServiceFolder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;

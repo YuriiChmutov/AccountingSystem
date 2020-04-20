@@ -2,7 +2,7 @@
 
 namespace AccountingNotebook.Utils
 {
-    public static class TimestampManipulation
+    public static class TimestampExtension
     {
         public static DateTime ConvertFromUnixTimestamp(this long timestamp)
         {
