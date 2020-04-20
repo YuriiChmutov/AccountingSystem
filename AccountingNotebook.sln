@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AccountingNotebook", "AccountingNotebook\AccountingNotebook.csproj", "{2EF1D2EC-CA45-429A-B253-ACA9618950EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2EF1D2EC-CA45-429A-B253-ACA9618950EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EF1D2EC-CA45-429A-B253-ACA9618950EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EF1D2EC-CA45-429A-B253-ACA9618950EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EF1D2EC-CA45-429A-B253-ACA9618950EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BF2A1EE5-43FA-4E1E-9F30-A59CF923EA30}
+	EndGlobalSection
+EndGlobal
