@@ -1,14 +1,15 @@
 ﻿using AccountingNotebook.Models;
 using System;
+using System.Threading.Tasks;
 
 namespace AccountingNotebook.Abstractions
 {
     public interface ITransactionService
     {
-        void Debit(decimal amount, string transactionDescription, Guid idAccount);
-        void Credit(decimal amount, string transactionDescription, Guid idAccount);
-        Transaction GetTransactionInfo(Guid idAccount, Guid idTransaction);
-        void DeleteTransaction(Guid idAccount, Guid idTransaction);
-        void DeleteAllTransactions(Guid idAccount);        
+        Task DebitAsync(decimal amount, string transactionDescription, Guid idAccount);
+        Task CreditAsync(decimal amount, string transactionDescription, Guid idAccount);
+        Task<Transaction> GetTransactionInfoAsync(Guid idAccount, Guid idTransaction);
+        Task DeleteTransactionAsync(Guid idAccount, Guid idTransaction);
+        Task DeleteAllTransactionsAsync(Guid idAccount);        
     }
 }

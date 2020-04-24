@@ -1,15 +1,17 @@
-﻿using System;
+﻿using AccountingNotebook.Models;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AccountingNotebook.Abstractions
 {
-    interface ITransactionHistoryService<T> where T : class
+    interface ITransactionHistoryService<T> where T : Transaction
     {
-        IEnumerable<T> GetAll();
-        T GetById(Guid id);
-        void Add(T item);
-        void AddRange(IEnumerable<T> items);
-        void Remove(T item);
-        void RemoveAll();
+        Task<IEnumerable<T>> GetAllAsync();
+        Task<T> GetByIdAsync(Guid id);
+        Task AddAsync(T transaction);
+        Task AddRangeAsync(IEnumerable<T> transactions);
+        Task RemoveAsync(T item);
+        Task RemoveAllAsync();
     }    
 }

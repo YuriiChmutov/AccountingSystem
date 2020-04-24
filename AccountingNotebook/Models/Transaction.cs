@@ -1,5 +1,6 @@
 ﻿using AccountingNotebook.Utils;
 using System;
+using System.Threading.Tasks;
 
 namespace AccountingNotebook.Models
 {
@@ -18,6 +19,11 @@ namespace AccountingNotebook.Models
             this.TransactionDescription = _description;
             this.Balance = _balance;
             this.TransactionId = id;
+        }
+
+        public static explicit operator Transaction(Task<Transaction> v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

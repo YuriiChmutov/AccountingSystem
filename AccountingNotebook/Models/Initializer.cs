@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace AccountingNotebook.Models
 {
-    public class AccountsList
+    public class Initializer
     {
-        private readonly List<Account> accounts = new List<Account>()
+        public readonly List<Account> accounts = new List<Account>()
         {
             new Account
             {
@@ -21,10 +21,5 @@ namespace AccountingNotebook.Models
                 Balance = 100M
             }            
         };
-
-        public Account GetById(Guid id)
-        {
-            return accounts.FirstOrDefault(x => x.AccountId == id);
-        }
     }
 }

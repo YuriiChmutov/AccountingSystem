@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System;
+using System.Net;
 
 namespace AccountingNotebook
 {
@@ -7,11 +10,26 @@ namespace AccountingNotebook
     {
         public static void Main(string[] args)
         {
-            CreateWebHostBuilder(args).Build().Run();
+            BuildWebHost(args).Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseStartup<Startup>()
+                .UseKestrel(options =>
+                {
+                    //задает максимально количество оновременно открытых соединений
+                    options.Limits.MaxConcurrentConnections = 100;
+                    //устанавливает максимальный размер для запроса в байтах
+                    options.Limits.MaxRequestBodySize = 10 * 1024;
+                    //задает минимальную скорость передачи данных в запросе в байтах в секунду
+                    options.Limits.MinRequestBodyDataRate =        
+                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    //задает минимальную скорость передачи данных в исходящем потоке в байтах в секунду
+                    options.Limits.MinResponseDataRate =           
+                        new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
+                    options.Listen(IPAddress.Loopback, 5000);
+                })
+                .Build();
     }
 }

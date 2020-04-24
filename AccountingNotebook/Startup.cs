@@ -1,27 +1,28 @@
 ﻿using AccountingNotebook.Abstractions;
-using AccountingNotebook.Controllers;
+using AccountingNotebook.Service.IAccountServiceFolder;
 using AccountingNotebook.Service.ITransactionServiceFolder;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AccountingNotebook
 {
     public class Startup
     {
-        //public Startup(IConfiguration configuration)
-        //{
-        //    Configuration = configuration;
-        //}
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
-        //public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore();
             services.AddTransient<ITransactionService, TransactionsService>();
-            services.AddTransient<TransactionsController>();
+            services.AddTransient<IAccountService, AccountService>();
             //.AddJsonOptions(o =>
             //{
             //    if (o.SerializerSettings.ContractResolver != null)
