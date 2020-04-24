@@ -18,7 +18,10 @@ namespace AccountingNotebook
                 .UseStartup<Startup>()
                 .UseKestrel(options =>
                 {
-                    //задает максимально количество оновременно открытых соединений
+                    // todo: delete IIS
+                    // todo: format + eng
+                    // todo: check which options are really required
+                    // задает максимально количество оновременно открытых соединений
                     options.Limits.MaxConcurrentConnections = 100;
                     //устанавливает максимальный размер для запроса в байтах
                     options.Limits.MaxRequestBodySize = 10 * 1024;

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AccountingNotebook.Service.ITransactionServiceFolder
+namespace AccountingNotebook.Service.TransactionService
 {
+    // todo: naming and add word service
     public class TransactionsHistory: ITransactionHistoryService<Transaction>
     {
+        // todo: naming (either _variable or Variable)
         private readonly List<Transaction> transactions = new List<Transaction>();
 
         public Task<Transaction> GetByIdAsync(Guid id)
@@ -30,6 +32,7 @@ namespace AccountingNotebook.Service.ITransactionServiceFolder
         
         public Task AddRangeAsync(IEnumerable<Transaction> transactions)
         {
+            // todo: add this in other places or remove
             this.transactions.AddRange(transactions);
             return Task.CompletedTask;
         }

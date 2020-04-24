@@ -3,10 +3,12 @@ using AccountingNotebook.Models;
 using System;
 using System.Threading.Tasks;
 
-namespace AccountingNotebook.Service.ITransactionServiceFolder
+namespace AccountingNotebook.Service.TransactionService
 {
-    public class TransactionsService: ITransactionService
-    {        
+    public class TransactionsService : ITransactionService
+    {
+        // todo: add readonly and access modifiers
+        // todo: do we need it?
         Initializer accountsList = new Initializer();
         IAccountService accountService;
 
@@ -19,12 +21,17 @@ namespace AccountingNotebook.Service.ITransactionServiceFolder
         {
             var account = accountService.GetById(idAccount);
 
-            if(account.Balance - amount < 0)
+            // todo: tread safety
+            if (account.Balance - amount < 0)
             {
                 throw new Exception("Not enough funds in the account!");
             }
 
+            // todo: modify balance in account servie
             account.Balance -= amount;
+            // todo: var
+            // todo: move guid to constructor (maybe)
+            // todo: create one method that will create Transaction object
             Transaction transaction = new Transaction(transactionDescription, amount, account.Balance, new Guid());
             await account.TransactionsHistory.AddAsync(transaction);
         }

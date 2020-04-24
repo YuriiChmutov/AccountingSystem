@@ -4,8 +4,10 @@ using System.Linq;
 
 namespace AccountingNotebook.Models
 {
+    // todo: maybe rename to TestData or something similar
     public class Initializer
     {
+        // todo: naming of props
         public readonly List<Account> accounts = new List<Account>()
         {
             new Account

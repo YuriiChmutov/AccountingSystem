@@ -3,8 +3,10 @@ using System.Linq;
 using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 
-namespace AccountingNotebook.Service.IAccountServiceFolder
+namespace AccountingNotebook.Service.AccountService
 {
+    // todo: sort imports through the project
+    // todo: naming
     public class AccountService: IAccountService
     {
         Initializer initializer = new Initializer();
@@ -13,10 +15,13 @@ namespace AccountingNotebook.Service.IAccountServiceFolder
             var account = initializer.accounts.FirstOrDefault(x => x.AccountId == id);
             return account;
         }
+
+        // todo: naming
         public void AddNewAccount(Account account)
         {
             initializer.accounts.Add(account);
         }
+
         public void DeleteAccount(Guid id)
         {
             var accout = GetById(id);

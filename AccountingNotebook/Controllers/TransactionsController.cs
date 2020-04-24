@@ -8,19 +8,20 @@ using System.Threading.Tasks;
 namespace AccountingNotebook.Controllers
 {
     [ApiController]
+    // todo: rename to api/transaction
     [Route("api/account/transactions")]
     public class TransactionsController : ControllerBase
     {
+        // todo: remove it please :)
         private readonly Initializer accounts;        
         private readonly ITransactionService transactionsService;
         private readonly ILogger<TransactionsController> logger;
         private readonly IAccountService accountService;
 
         public TransactionsController(ILogger<TransactionsController> logger,
-            ITransactionService transactionsService, Initializer accounts,
+            ITransactionService transactionsService,
             IAccountService accountService)
         {
-            this.accounts = accounts;
             this.transactionsService = transactionsService;
             this.logger = logger;
             this.accountService = accountService;
@@ -31,11 +32,13 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: validation
                 var account = accountService.GetById(idAccount);
                 return Ok(await account.TransactionsHistory.GetAllAsync());
             }
             catch (Exception ex)
             {
+                // todo: Why not found?
                 logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
@@ -46,6 +49,7 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: validation
                 return Ok(await transactionsService.GetTransactionInfoAsync(idAccount, idTransaction));
             }
             catch (Exception ex)
@@ -57,11 +61,13 @@ namespace AccountingNotebook.Controllers
 
         [HttpPost]
         [Route("Credit")]
-        public async Task<IActionResult> CreateTransactionCreditAsync(Guid idAccount,
+        public async Task<IActionResult> CreateTransactionCreditAsync(
+            Guid idAccount,
             [FromBody]Transaction transaction)
         {
             try
             {
+                // todo: validation
                 var account = accountService.GetById(idAccount);
 
                 if (account == null)
@@ -75,6 +81,7 @@ namespace AccountingNotebook.Controllers
             }
             catch (Exception ex)
             {
+                // todo: copy+paste :)
                 logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
@@ -109,6 +116,7 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: validation
                 await transactionsService.DeleteTransactionAsync(idAccount, idTransaction);
                 return Ok();
             }
@@ -124,6 +132,7 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: validation
                 await transactionsService.DeleteAllTransactionsAsync(idAccount);
                 return Ok();
             }

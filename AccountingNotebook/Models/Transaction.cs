@@ -6,6 +6,8 @@ namespace AccountingNotebook.Models
 {
     public class Transaction
     {
+        // todo: from account id
+        // todo: to account id
         public Guid TransactionId { get; set; }
         public string TransactionDescription { get; set; }
         public decimal Cost { get; set; }
@@ -21,6 +23,7 @@ namespace AccountingNotebook.Models
             this.TransactionId = id;
         }
 
+        // todo: remove
         public static explicit operator Transaction(Task<Transaction> v)
         {
             throw new NotImplementedException();

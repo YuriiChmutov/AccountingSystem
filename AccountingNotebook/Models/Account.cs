@@ -1,4 +1,4 @@
-﻿using AccountingNotebook.Service.ITransactionServiceFolder;
+﻿using AccountingNotebook.Service.TransactionService;
 using System;
 
 namespace AccountingNotebook.Models
@@ -7,7 +7,7 @@ namespace AccountingNotebook.Models
     {
         public Guid AccountId { get; set; }
         public string Name { get; set; }
-        public decimal Balance { get; set; }         
-        public TransactionsHistory TransactionsHistory { get; set; }
+        public decimal Balance { get; set; }
+        public TransactionsHistory TransactionsHistory { get; set; } = new TransactionsHistory();
     }
 }

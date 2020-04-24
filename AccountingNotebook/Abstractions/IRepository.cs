@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace AccountingNotebook.Abstractions
 {
+    // todo: I think you are not going to need it :)
     public interface IRepository<T> where T : class
     {
         IEnumerable<T> GetAll();
