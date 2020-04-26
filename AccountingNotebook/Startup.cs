@@ -3,7 +3,6 @@ using AccountingNotebook.Models;
 using AccountingNotebook.Service.AccountService;
 using AccountingNotebook.Service.TransactionService;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -41,7 +40,7 @@ namespace AccountingNotebook
             });
         }
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
             app.UseStatusCodePages();
             app.UseMvc();           

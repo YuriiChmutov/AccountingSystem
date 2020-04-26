@@ -1,9 +1,9 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace AccountingNotebook.Service.AccountService
 {
