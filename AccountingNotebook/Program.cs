@@ -19,16 +19,12 @@ namespace AccountingNotebook
                 .UseKestrel(options =>
                 {
                     // todo: delete IIS
-                    // todo: format + eng
-                    // todo: check which options are really required
-                    // задает максимально количество оновременно открытых соединений
-                    options.Limits.MaxConcurrentConnections = 100;
-                    //устанавливает максимальный размер для запроса в байтах
+                    
+                    // todo: check which options are really required                    
+                    options.Limits.MaxConcurrentConnections = 100;                    
                     options.Limits.MaxRequestBodySize = 10 * 1024;
-                    //задает минимальную скорость передачи данных в запросе в байтах в секунду
                     options.Limits.MinRequestBodyDataRate =        
                         new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
-                    //задает минимальную скорость передачи данных в исходящем потоке в байтах в секунду
                     options.Limits.MinResponseDataRate =           
                         new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
                     options.Listen(IPAddress.Loopback, 5000);

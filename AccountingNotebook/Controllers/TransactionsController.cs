@@ -8,23 +8,20 @@ using System.Threading.Tasks;
 namespace AccountingNotebook.Controllers
 {
     [ApiController]
-    // todo: rename to api/transaction
-    [Route("api/account/transactions")]
+    [Route("api/transactions")]
     public class TransactionsController : ControllerBase
-    {
-        // todo: remove it please :)
-        private readonly Initializer accounts;        
-        private readonly ITransactionService transactionsService;
-        private readonly ILogger<TransactionsController> logger;
-        private readonly IAccountService accountService;
+    {                      
+        private readonly ITransactionService _transactionsService;
+        private readonly ILogger<TransactionsController> _logger;
+        private readonly IAccountService _accountService;
 
         public TransactionsController(ILogger<TransactionsController> logger,
             ITransactionService transactionsService,
             IAccountService accountService)
         {
-            this.transactionsService = transactionsService;
-            this.logger = logger;
-            this.accountService = accountService;
+            _transactionsService = transactionsService;
+            _logger = logger;
+            _accountService = accountService;
         }
 
         [HttpGet]
@@ -32,14 +29,20 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
-                // todo: validation
-                var account = accountService.GetById(idAccount);
-                return Ok(await account.TransactionsHistory.GetAllAsync());
+                if (ModelState.IsValid)
+                {
+                    var account = await _accountService.GetAccountByIdAsync(idAccount);
+                    if(account == null)
+                    {
+                        return NotFound();
+                    }                    
+                    return Ok(await _transactionsService.GetAllUserTransactionsAsync(idAccount));
+                }
+                return BadRequest();                
             }
             catch (Exception ex)
             {
-                // todo: Why not found?
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Account with id {idAccount} returned null reference", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }
@@ -49,12 +52,16 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
-                // todo: validation
-                return Ok(await transactionsService.GetTransactionInfoAsync(idAccount, idTransaction));
+                if (ModelState.IsValid || (idAccount != null && idTransaction != null))
+                {
+                    return Ok(await _transactionsService.GetTransactionInfoAsync(idAccount, idTransaction));
+                }
+                return BadRequest();
             }
             catch (Exception ex)
             {
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Account with id {idAccount} or " +
+                    $"transaction with id {idTransaction} returned null reference", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }
@@ -62,51 +69,48 @@ namespace AccountingNotebook.Controllers
         [HttpPost]
         [Route("Credit")]
         public async Task<IActionResult> CreateTransactionCreditAsync(
-            Guid idAccount,
+            Guid idAccountTo, Guid idAccountFrom,
             [FromBody]Transaction transaction)
         {
             try
             {
-                // todo: validation
-                var account = accountService.GetById(idAccount);
-
-                if (account == null)
+                if (!ModelState.IsValid)
                 {
-                    logger.LogInformation($"Account with id {idAccount} wasn't found");
-                    return NotFound();
+                    return RedirectToPage("CreateTransactionCreditAsync");
                 }
-
-                await transactionsService.CreditAsync(transaction.Cost, transaction.TransactionDescription, account.AccountId);
-                return Ok();
+                else
+                {
+                    //var account = _accountService.GetById(idAccount);
+                    //if(account == null)
+                    //{
+                    //    return NotFound();
+                    //}
+                    await _transactionsService.CreditAsync(TypeOfTransaction.Credit, idAccountFrom, idAccountTo,
+                        transaction.Cost, transaction.TransactionDescription);
+                    return Ok();
+                }                
             }
             catch (Exception ex)
             {
-                // todo: copy+paste :)
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Accounts with id {idAccountTo} or {idAccountFrom} returned null referance", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }
 
         [HttpPost]
         [Route("Debit")]
-        public async Task<IActionResult> CreateTransactionDebitAsync(Guid idAccount,
+        public async Task<IActionResult> CreateTransactionDebitAsync(Guid idAccountFrom, Guid idAccountTo,
             [FromBody]Transaction transaction)
         {
             try
             {
-                var account = accountService.GetById(idAccount);
-
-                if (account == null)
-                {
-                    return NotFound();
-                }
-
-                await transactionsService.DebitAsync(transaction.Cost, transaction.TransactionDescription, account.AccountId);
+                await _transactionsService.DebitAsync(TypeOfTransaction.Debit, idAccountFrom, idAccountTo,
+                    transaction.Cost, transaction.TransactionDescription);
                 return Ok();
             }
             catch (Exception ex)
             {
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Accounts with id {idAccountFrom} or {idAccountTo} weren't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }
@@ -116,13 +120,19 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
-                // todo: validation
-                await transactionsService.DeleteTransactionAsync(idAccount, idTransaction);
-                return Ok();
+                if(!ModelState.IsValid || (idAccount == null || idTransaction == null))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    await _transactionsService.DeleteTransactionAsync(idAccount, idTransaction);
+                    return Ok();
+                }                
             }
             catch (Exception ex)
             {
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }
         }
@@ -133,12 +143,12 @@ namespace AccountingNotebook.Controllers
             try
             {
                 // todo: validation
-                await transactionsService.DeleteAllTransactionsAsync(idAccount);
+                await _transactionsService.DeleteAllTransactionsAsync(idAccount);
                 return Ok();
             }
             catch (Exception ex)
             {
-                logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }

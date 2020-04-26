@@ -22,11 +22,10 @@ namespace AccountingNotebook
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore()
-                .AddJsonFormatters();
-            // todo: why transient? :)
-            services.AddTransient<ITransactionService, TransactionsService>();
-            services.AddTransient<IAccountService, AccountService>();
-            services.AddTransient<ITransactionHistoryService<Transaction>, TransactionsHistory>();
+                .AddJsonFormatters();            
+            services.AddSingleton<ITransactionService, TransactionsService>();
+            services.AddSingleton<IAccountService, AccountService>();
+            services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistory>();
             //.AddJsonOptions(o =>
             //{
             //    if (o.SerializerSettings.ContractResolver != null)
@@ -35,22 +34,15 @@ namespace AccountingNotebook
             //                            as DefaultContractResolver;
             //        castedResolver.NamingStrategy = null;
             //    }
-            //});            
+            //});          
+            services.Configure<IISOptions>(options =>
+            {
+                options.ForwardClientCertificate = false;
+            });
         }
-
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // todo: remove or explain why we need them
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseExceptionHandler();
-            }
-
             app.UseStatusCodePages();
             app.UseMvc();           
         }

@@ -6,27 +6,26 @@ namespace AccountingNotebook.Models
 {
     public class Transaction
     {
-        // todo: from account id
-        // todo: to account id
+        public TypeOfTransaction Type { get; set; }
+        public Guid ToAccountId { get; set; }
+        public Guid FromAccountId { get; set; }        
         public Guid TransactionId { get; set; }
         public string TransactionDescription { get; set; }
         public decimal Cost { get; set; }
         public long Timestamp { get; set; }
         public decimal Balance { get; set; }
 
-        public Transaction(string _description, decimal _cost, decimal _balance, Guid id)
+        public Transaction(TypeOfTransaction typeOfTransaction, Guid idAccountFrom, Guid idAccountTo,
+            string _description, decimal _cost, decimal _balance)
         {
+            this.Type = typeOfTransaction;
+            this.FromAccountId = idAccountFrom;
+            this.ToAccountId = idAccountTo;
             this.Cost = _cost;
-            this.Timestamp = DateTime.UtcNow.ConvertToUnixTimestamp();          
+            this.Timestamp = DateTime.UtcNow.ConvertToUnixTimestamp();
             this.TransactionDescription = _description;
             this.Balance = _balance;
-            this.TransactionId = id;
-        }
-
-        // todo: remove
-        public static explicit operator Transaction(Task<Transaction> v)
-        {
-            throw new NotImplementedException();
+            this.TransactionId = new Guid();
         }
     }
 }

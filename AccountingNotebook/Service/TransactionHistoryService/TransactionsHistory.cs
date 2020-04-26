@@ -10,42 +10,49 @@ namespace AccountingNotebook.Service.TransactionService
     // todo: naming and add word service
     public class TransactionsHistory: ITransactionHistoryService<Transaction>
     {
-        // todo: naming (either _variable or Variable)
-        private readonly List<Transaction> transactions = new List<Transaction>();
+        private readonly List<Transaction> _transactions = new List<Transaction>();
 
-        public Task<Transaction> GetByIdAsync(Guid id)
+        public Task<Transaction> GetByIdAsync(Guid idTransaction, Guid idAccount)
         {
-            var transaction = transactions.FirstOrDefault(x => x.TransactionId == id);
-            return Task.FromResult(transaction);
+            var transaction = from t in _transactions
+                             where (t.ToAccountId == idAccount || t.FromAccountId == idAccount) ||
+                             t.TransactionId == idTransaction
+                             select t;
+            return Task.FromResult(transaction.FirstOrDefault());
         }
 
-        public Task<IEnumerable<Transaction>> GetAllAsync()
+        public Task<IEnumerable<Transaction>> GetAllAsync(Guid idAccount)
         {
-            return Task.FromResult(transactions.AsEnumerable());            
+            var transactions = from t in _transactions
+                               where t.FromAccountId == idAccount ||
+                               t.ToAccountId == idAccount
+                               select t;
+            return Task.FromResult(_transactions.AsEnumerable());            
         }
 
         public Task AddAsync(Transaction transaction)        
         {
-            transactions.Add(transaction);
+            _transactions.Add(transaction);
             return Task.CompletedTask;
         }
         
-        public Task AddRangeAsync(IEnumerable<Transaction> transactions)
-        {
-            // todo: add this in other places or remove
-            this.transactions.AddRange(transactions);
-            return Task.CompletedTask;
-        }
-
         public Task RemoveAsync(Transaction transaction)
         {
-            transactions.Remove(transaction);
+            _transactions.Remove(transaction);
             return Task.CompletedTask;
         }
 
-        public Task RemoveAllAsync()
+        //кажется я ломаю логику независимости транзакций
+        //хотя soft delete...
+        public Task CleanAllUserTransactionsAsync(Guid idAccount) 
         {
-            transactions.Clear();
+            foreach (var transaction in _transactions)
+            {
+                if(transaction.ToAccountId == idAccount || transaction.FromAccountId == idAccount)
+                {
+                    _transactions.Remove(transaction);
+                }
+            }
             return Task.CompletedTask;
         }
     }

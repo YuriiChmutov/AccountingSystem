@@ -1,31 +1,32 @@
-﻿using System;
-using System.Linq;
-using AccountingNotebook.Abstractions;
+﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace AccountingNotebook.Service.AccountService
 {
-    // todo: sort imports through the project
     // todo: naming
     public class AccountService: IAccountService
     {
-        Initializer initializer = new Initializer();
-        public Account GetById(Guid id)
+        private readonly List<Account> _accounts = new List<Account>();
+        public Task<Account> GetAccountByIdAsync(Guid id)
         {
-            var account = initializer.accounts.FirstOrDefault(x => x.AccountId == id);
-            return account;
+            var account = _accounts.FirstOrDefault(x => x.AccountId == id);
+            return Task.FromResult(account);
         }
 
-        // todo: naming
-        public void AddNewAccount(Account account)
+        public Task AddNewAccountAsync(Account account)
         {
-            initializer.accounts.Add(account);
+            _accounts.Add(account);
+            return Task.CompletedTask;
         }
 
-        public void DeleteAccount(Guid id)
-        {
-            var accout = GetById(id);
-            initializer.accounts.Remove(accout);
+        public Task DeleteAccountAsync(Account account)
+        {            
+            _accounts.Remove(account);
+            return Task.CompletedTask;
         }
     }
 }
