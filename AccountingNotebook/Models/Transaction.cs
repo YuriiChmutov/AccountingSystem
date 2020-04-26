@@ -1,6 +1,5 @@
 ﻿using AccountingNotebook.Utils;
 using System;
-using System.Threading.Tasks;
 
 namespace AccountingNotebook.Models
 {
@@ -11,8 +10,10 @@ namespace AccountingNotebook.Models
         public Guid FromAccountId { get; set; }        
         public Guid TransactionId { get; set; }
         public string TransactionDescription { get; set; }
+        // todo: rename please
         public decimal Cost { get; set; }
         public long Timestamp { get; set; }
+        // todo: delete
         public decimal Balance { get; set; }
 
         public Transaction(TypeOfTransaction typeOfTransaction, Guid idAccountFrom, Guid idAccountTo,

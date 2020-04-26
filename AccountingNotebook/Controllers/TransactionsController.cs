@@ -29,11 +29,13 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: revert condition please
                 if (ModelState.IsValid)
                 {
                     var account = await _accountService.GetAccountByIdAsync(idAccount);
                     if(account == null)
                     {
+                        // todo: description
                         return NotFound();
                     }                    
                     return Ok(await _transactionsService.GetAllUserTransactionsAsync(idAccount));
@@ -46,7 +48,7 @@ namespace AccountingNotebook.Controllers
                 return StatusCode(500, "A problem happened while handing your request");
             }            
         }
-                       
+
         [HttpGet("{id}", Name = "GetTransaction")]
         public async Task<IActionResult> GetTransactionAsync(Guid idAccount, Guid idTransaction)
         {
@@ -74,6 +76,7 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: less vlozhenost
                 if (!ModelState.IsValid)
                 {
                     return RedirectToPage("CreateTransactionCreditAsync");

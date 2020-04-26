@@ -12,12 +12,15 @@ namespace AccountingNotebook.Service.TransactionService
     {
         private readonly List<Transaction> _transactions = new List<Transaction>();
 
+        // todo: accountId, transactionId
         public Task<Transaction> GetByIdAsync(Guid idTransaction, Guid idAccount)
         {
+            // todo: change to method syntax
             var transaction = from t in _transactions
                              where (t.ToAccountId == idAccount || t.FromAccountId == idAccount) ||
                              t.TransactionId == idTransaction
                              select t;
+
             return Task.FromResult(transaction.FirstOrDefault());
         }
 
@@ -36,6 +39,7 @@ namespace AccountingNotebook.Service.TransactionService
             return Task.CompletedTask;
         }
         
+        // todo: kill it please
         public Task RemoveAsync(Transaction transaction)
         {
             _transactions.Remove(transaction);

@@ -19,7 +19,7 @@ namespace AccountingNotebook
                 .UseKestrel(options =>
                 {
                     // todo: delete IIS
-                    
+                    // todo: delete nasty spaces
                     // todo: check which options are really required                    
                     options.Limits.MaxConcurrentConnections = 100;                    
                     options.Limits.MaxRequestBodySize = 10 * 1024;

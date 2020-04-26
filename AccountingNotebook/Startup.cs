@@ -25,6 +25,7 @@ namespace AccountingNotebook
             services.AddSingleton<ITransactionService, TransactionsService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistory>();
+            // todo: remove or uncomment and explain why
             //.AddJsonOptions(o =>
             //{
             //    if (o.SerializerSettings.ContractResolver != null)

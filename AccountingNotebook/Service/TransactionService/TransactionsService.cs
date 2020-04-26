@@ -19,8 +19,14 @@ namespace AccountingNotebook.Service.TransactionService
             _transactionHistoryService = transactionHistoryService;
         }
 
-        public Transaction CreateTransaction(TypeOfTransaction typeOfTransaction, Guid idAccountFrom, Guid idAccountTo,
-            string description, decimal cost, decimal balance)
+        // todo: please format like this
+        public Transaction CreateTransaction(
+            TypeOfTransaction typeOfTransaction,
+            Guid idAccountFrom,
+            Guid idAccountTo,
+            string description,
+            decimal cost,
+            decimal balance)
         {
             return new Transaction(typeOfTransaction, idAccountFrom, idAccountTo, description, cost, balance);
         }
@@ -60,6 +66,7 @@ namespace AccountingNotebook.Service.TransactionService
             await _transactionHistoryService.AddAsync(transaction);        
         }
 
+        // todo: move to another controller
         public async Task<Transaction> GetTransactionInfoAsync(Guid idAccount, Guid idTransaction)
         {
             var transactionToReturn = await _transactionHistoryService.GetByIdAsync(idTransaction, idAccount);

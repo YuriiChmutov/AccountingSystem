@@ -2,7 +2,8 @@
 {
     public enum TypeOfTransaction
     {
-        Debit,
+        // todo: please explicit value
+        Debit = 0,
         Credit
     }
 }
