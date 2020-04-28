@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace AccountingNotebook.Service.AccountService
 {
+    // todo: naming (link InMemory or smth)
     public class AccountService: IAccountService
     {
+        // todo: mb some concurrent version
         private readonly List<Account> _accounts = new List<Account>();
         public Task<Account> GetAccountByIdAsync(Guid id)
         {
@@ -22,6 +24,7 @@ namespace AccountingNotebook.Service.AccountService
             return Task.CompletedTask;
         }
 
+        // todo: delete by id
         public Task DeleteAccountAsync(Account account)
         {
             _accounts.Remove(account);

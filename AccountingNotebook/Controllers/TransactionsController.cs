@@ -27,7 +27,8 @@ namespace AccountingNotebook.Controllers
         [HttpPost]
         [Route("Credit")]
         public async Task<IActionResult> CreateTransactionCreditAsync(
-            Guid accountToId, Guid accountFromId,
+            Guid accountToId,
+            Guid accountFromId,
             [FromBody]Transaction transaction)
         {
             try
@@ -40,15 +41,21 @@ namespace AccountingNotebook.Controllers
                 if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
                     await _accountService.GetAccountByIdAsync(accountFromId) == null)
                 {
+                    // todo: split to two please :)
                     return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
                 }
 
+                // todo: add unit tests :) mstest
+                // todo: don't pass enum please
                 await _transactionsService.CreditAsync(TypeOfTransaction.Credit, accountFromId, accountToId,
                     transaction.Amount, transaction.TransactionDescription);
+                
+                // todo: maybe return transaction id?
                 return Ok();
             }
             catch (Exception ex)
             {
+                // todo: change please :)
                 _logger.LogInformation($"Accounts with id {accountToId} or {accountFromId} returned null referance", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }
@@ -78,7 +85,7 @@ namespace AccountingNotebook.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Accounts with id {accountFromId} or {accountToId} weren't found", ex);
+                _logger.LogInformation($"Account with id {accountFromId} or {accountToId} wasn't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }
         }

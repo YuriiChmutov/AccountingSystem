@@ -22,6 +22,7 @@ namespace AccountingNotebook
         {
             services.AddMvcCore()
                 .AddJsonFormatters();
+
             services.AddSingleton<ITransactionService, TransactionService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistoryService>();
@@ -29,6 +30,7 @@ namespace AccountingNotebook
         
         public void Configure(IApplicationBuilder app)
         {
+            // todo: do we need it?
             app.UseStatusCodePages();
             app.UseMvc();
         }
