@@ -1,6 +1,7 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using AccountingNotebook.Service.AccountService;
+using AccountingNotebook.Service.TransactionHistoryService;
 using AccountingNotebook.Service.TransactionService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -16,35 +17,20 @@ namespace AccountingNotebook
         }
 
         public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
+        
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvcCore()
-                .AddJsonFormatters();            
-            services.AddSingleton<ITransactionService, TransactionsService>();
+                .AddJsonFormatters();
+            services.AddSingleton<ITransactionService, TransactionService>();
             services.AddSingleton<IAccountService, AccountService>();
-            services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistory>();
-            // todo: remove or uncomment and explain why
-            //.AddJsonOptions(o =>
-            //{
-            //    if (o.SerializerSettings.ContractResolver != null)
-            //    {
-            //        var castedResolver = o.SerializerSettings.ContractResolver
-            //                            as DefaultContractResolver;
-            //        castedResolver.NamingStrategy = null;
-            //    }
-            //});          
-            services.Configure<IISOptions>(options =>
-            {
-                options.ForwardClientCertificate = false;
-            });
+            services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistoryService>();
         }
         
         public void Configure(IApplicationBuilder app)
         {
             app.UseStatusCodePages();
-            app.UseMvc();           
+            app.UseMvc();
         }
     }
 }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 namespace AccountingNotebook.Controllers
 {
     [ApiController]
-    [Route("api/transactions")]
+    [Route("api/transaction")]
     public class TransactionsController : ControllerBase
-    {                      
+    {
         private readonly ITransactionService _transactionsService;
         private readonly ILogger<TransactionsController> _logger;
         private readonly IAccountService _accountService;
@@ -23,137 +23,64 @@ namespace AccountingNotebook.Controllers
             _logger = logger;
             _accountService = accountService;
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetTransactionHistoryAsync(Guid idAccount)
-        {
-            try
-            {
-                // todo: revert condition please
-                if (ModelState.IsValid)
-                {
-                    var account = await _accountService.GetAccountByIdAsync(idAccount);
-                    if(account == null)
-                    {
-                        // todo: description
-                        return NotFound();
-                    }                    
-                    return Ok(await _transactionsService.GetAllUserTransactionsAsync(idAccount));
-                }
-                return BadRequest();                
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"Account with id {idAccount} returned null reference", ex);
-                return StatusCode(500, "A problem happened while handing your request");
-            }            
-        }
-
-        [HttpGet("{id}", Name = "GetTransaction")]
-        public async Task<IActionResult> GetTransactionAsync(Guid idAccount, Guid idTransaction)
-        {
-            try
-            {
-                if (ModelState.IsValid || (idAccount != null && idTransaction != null))
-                {
-                    return Ok(await _transactionsService.GetTransactionInfoAsync(idAccount, idTransaction));
-                }
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"Account with id {idAccount} or " +
-                    $"transaction with id {idTransaction} returned null reference", ex);
-                return StatusCode(500, "A problem happened while handing your request");
-            }            
-        }
-
+        
         [HttpPost]
         [Route("Credit")]
         public async Task<IActionResult> CreateTransactionCreditAsync(
-            Guid idAccountTo, Guid idAccountFrom,
+            Guid accountToId, Guid accountFromId,
             [FromBody]Transaction transaction)
         {
             try
             {
-                // todo: less vlozhenost
                 if (!ModelState.IsValid)
                 {
-                    return RedirectToPage("CreateTransactionCreditAsync");
+                    return BadRequest("Entered information is incorrect");
                 }
-                else
+
+                if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
+                    await _accountService.GetAccountByIdAsync(accountFromId) == null)
                 {
-                    //var account = _accountService.GetById(idAccount);
-                    //if(account == null)
-                    //{
-                    //    return NotFound();
-                    //}
-                    await _transactionsService.CreditAsync(TypeOfTransaction.Credit, idAccountFrom, idAccountTo,
-                        transaction.Cost, transaction.TransactionDescription);
-                    return Ok();
-                }                
+                    return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
+                }
+
+                await _transactionsService.CreditAsync(TypeOfTransaction.Credit, accountFromId, accountToId,
+                    transaction.Amount, transaction.TransactionDescription);
+                return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Accounts with id {idAccountTo} or {idAccountFrom} returned null referance", ex);
+                _logger.LogInformation($"Accounts with id {accountToId} or {accountFromId} returned null referance", ex);
                 return StatusCode(500, "A problem happened while handing your request");
-            }            
+            }
         }
 
         [HttpPost]
         [Route("Debit")]
-        public async Task<IActionResult> CreateTransactionDebitAsync(Guid idAccountFrom, Guid idAccountTo,
+        public async Task<IActionResult> CreateTransactionDebitAsync(Guid accountFromId, Guid accountToId,
             [FromBody]Transaction transaction)
         {
             try
             {
-                await _transactionsService.DebitAsync(TypeOfTransaction.Debit, idAccountFrom, idAccountTo,
-                    transaction.Cost, transaction.TransactionDescription);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"Accounts with id {idAccountFrom} or {idAccountTo} weren't found", ex);
-                return StatusCode(500, "A problem happened while handing your request");
-            }            
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTransaction(Guid idAccount, Guid idTransaction)
-        {
-            try
-            {
-                if(!ModelState.IsValid || (idAccount == null || idTransaction == null))
+                if (!ModelState.IsValid)
                 {
-                    return NotFound();
+                    return BadRequest("Entered information is incorrect");
                 }
-                else
-                {
-                    await _transactionsService.DeleteTransactionAsync(idAccount, idTransaction);
-                    return Ok();
-                }                
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
-                return StatusCode(500, "A problem happened while handing your request");
-            }
-        }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteTransactionsHistory(Guid idAccount)
-        {
-            try
-            {
-                // todo: validation
-                await _transactionsService.DeleteAllTransactionsAsync(idAccount);
+                if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
+                    await _accountService.GetAccountByIdAsync(accountFromId) == null)
+                {
+                    return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
+                }
+
+                await _transactionsService.DebitAsync(TypeOfTransaction.Debit, accountFromId, accountToId,
+                    transaction.Amount, transaction.TransactionDescription);
                 return Ok();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Account with id {idAccount} wasn't found", ex);
+                _logger.LogInformation($"Accounts with id {accountFromId} or {accountToId} weren't found", ex);
                 return StatusCode(500, "A problem happened while handing your request");
-            }            
+            }
         }
     }
 }

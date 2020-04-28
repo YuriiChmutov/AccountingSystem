@@ -7,11 +7,12 @@ namespace AccountingNotebook.Abstractions
 {
     public interface ITransactionHistoryService<T> where T : Transaction
     {
-        // todo: add doc
-        Task<IEnumerable<T>> GetAllAsync(Guid idAccount);
-        Task<T> GetByIdAsync(Guid idTransaction, Guid idAccount);
-        Task AddAsync(T transaction);        
-        Task RemoveAsync(T item);        
-        Task CleanAllUserTransactionsAsync(Guid idAccount);
-    }    
+        /// <summary>
+        /// It is an interface which responsible for account's data behavior.
+        /// </summary>
+        /// <param name="accountId">It is an id of account we want see information about</param>
+        Task<IEnumerable<T>> GetAllAsync(Guid accountId);
+        Task<T> GetByIdAsync(Guid transactionId, Guid accountId);
+        Task AddAsync(T transaction);
+    }
 }

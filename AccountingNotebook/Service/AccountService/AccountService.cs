@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace AccountingNotebook.Service.AccountService
 {
-    // todo: naming
     public class AccountService: IAccountService
     {
         private readonly List<Account> _accounts = new List<Account>();
@@ -24,8 +23,18 @@ namespace AccountingNotebook.Service.AccountService
         }
 
         public Task DeleteAccountAsync(Account account)
-        {            
+        {
             _accounts.Remove(account);
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateAccountBalanceAsync(Guid accountId, decimal balance)
+        {
+            var account = _accounts.FirstOrDefault(a => a.AccountId == accountId);
+            if(account != null)
+            {
+                account.Balance = balance;
+            }
             return Task.CompletedTask;
         }
     }
