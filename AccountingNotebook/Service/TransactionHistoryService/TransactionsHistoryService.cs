@@ -1,6 +1,7 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,8 +10,7 @@ namespace AccountingNotebook.Service.TransactionHistoryService
 {
     public class TransactionsHistoryService: ITransactionHistoryService<Transaction>
     {
-        // todo: do we need concurrency here?
-        private readonly List<Transaction> _transactions = new List<Transaction>();
+        private readonly ConcurrentBag<Transaction> _transactions = new ConcurrentBag<Transaction>();
 
         public Task<Transaction> GetByIdAsync(Guid transactionId, Guid accountId)
         {

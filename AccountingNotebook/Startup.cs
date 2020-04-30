@@ -30,8 +30,6 @@ namespace AccountingNotebook
         
         public void Configure(IApplicationBuilder app)
         {
-            // todo: do we need it?
-            app.UseStatusCodePages();
             app.UseMvc();
         }
     }

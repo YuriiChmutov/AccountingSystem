@@ -38,25 +38,32 @@ namespace AccountingNotebook.Controllers
                     return BadRequest("Entered information is incorrect");
                 }
 
-                if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
-                    await _accountService.GetAccountByIdAsync(accountFromId) == null)
+                if (await _accountService.GetAccountByIdAsync(accountToId) == null)
                 {
-                    // todo: split to two please :)
-                    return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
+                    return NotFound($"Account with id {accountToId} doesn't exist");
+                }
+
+                if(await _accountService.GetAccountByIdAsync(accountFromId) == null)
+                {
+                    return NotFound($"Account with id {accountFromId} doesn't exist");
                 }
 
                 // todo: add unit tests :) mstest
-                // todo: don't pass enum please
-                await _transactionsService.CreditAsync(TypeOfTransaction.Credit, accountFromId, accountToId,
-                    transaction.Amount, transaction.TransactionDescription);
+                await _transactionsService.CreditAsync(accountFromId, accountToId,
+                    transaction.Amount, transaction.TransactionDescription, transaction.Type);
                 
-                // todo: maybe return transaction id?
-                return Ok();
+                return Ok(transaction.TransactionId);
             }
             catch (Exception ex)
             {
-                // todo: change please :)
-                _logger.LogInformation($"Accounts with id {accountToId} or {accountFromId} returned null referance", ex);
+                if(accountFromId == null)
+                {
+                    _logger.LogInformation($"Account with id {accountFromId} returned null referance", ex);
+                }
+                if(accountToId == null)
+                {
+                    _logger.LogInformation($"Account with id {accountToId} returned null referance", ex);
+                }
                 return StatusCode(500, "A problem happened while handing your request");
             }
         }
@@ -79,7 +86,7 @@ namespace AccountingNotebook.Controllers
                     return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
                 }
 
-                await _transactionsService.DebitAsync(TypeOfTransaction.Debit, accountFromId, accountToId,
+                await _transactionsService.DebitAsync(accountFromId, accountToId,
                     transaction.Amount, transaction.TransactionDescription);
                 return Ok();
             }
