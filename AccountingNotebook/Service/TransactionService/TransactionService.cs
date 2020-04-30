@@ -1,7 +1,6 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace AccountingNotebook.Service.TransactionService
         private readonly IAccountService _accountService;
         private readonly ILogger<TransactionService> _logger;
         private readonly ITransactionHistoryService<Transaction> _transactionHistoryService;
-        private readonly static Mutex mutex= new Mutex(false, "MyMutex");
+        private readonly static Mutex mutex = new Mutex(false, "MyMutex");
 
         // todo: add logging and logger to all services
         public TransactionService(ILogger<TransactionService> logger,
@@ -44,12 +43,22 @@ namespace AccountingNotebook.Service.TransactionService
             string transactionDescription,
             TypeOfTransaction typeOfTransaction = TypeOfTransaction.Credit)
         {
+            var isFundsWereTransferedSuccessfully = false;
+            var balanceBeforeTransfer = 0m;
+
             try
             {
                 var accountFrom = await _accountService.GetAccountByIdAsync(accountFromId);
+                // todo: check if null here
+                balanceBeforeTransfer = accountFrom.Balance;
 
                 // todo: exception handling
+                // todo: maybe slim? I believe we don't need a kernel-mode
                 mutex.WaitOne();
+
+                // todo: add pretty thing:
+                // MyMutex.RunSingleThread(() => { })
+
                 if (accountFrom.Balance - amount < 0)
                 {
                     throw new Exception("Not enough funds in the account!");
@@ -57,26 +66,33 @@ namespace AccountingNotebook.Service.TransactionService
 
                 await _accountService.UpdateAccountBalanceAsync(accountFromId, accountFrom.Balance - amount);
 
-                var transaction = CreateTransaction(typeOfTransaction, accountFromId, accountToId,
-                    transactionDescription, amount);
+                isFundsWereTransferedSuccessfully = true;
+
+                var transaction = CreateTransaction(typeOfTransaction, accountFromId, accountToId, transactionDescription, amount);
 
                 await _transactionHistoryService.AddAsync(transaction);
+
                 mutex.ReleaseMutex();
             }
             catch (Exception ex)
             {
-                if(accountFromId == null)
+                if (isFundsWereTransferedSuccessfully)
                 {
-                    _logger.LogInformation($"Account with id {accountFromId} returned null reference: {ex.Message}");
+                    await _accountService.UpdateAccountBalanceAsync(accountFromId, balanceBeforeTransfer);
                 }
-                else if(accountToId == null)
-                {
-                    _logger.LogInformation($"Account with id {accountToId} returned null reference: {ex.Message}");
-                }
-                else
-                {
-                    _logger.LogInformation(ex.Message);
-                }
+
+                //if(accountFromId == null)
+                //{
+                //    _logger.LogInformation($"Account with id {accountFromId} returned null reference: {ex.Message}");
+                //}
+                //else if(accountToId == null)
+                //{
+                //    _logger.LogInformation($"Account with id {accountToId} returned null reference: {ex.Message}");
+                //}
+                //else
+                //{
+                //    _logger.LogInformation(ex.Message);
+                //}
             }
         }
 
@@ -121,13 +137,18 @@ namespace AccountingNotebook.Service.TransactionService
         public async Task<List<Transaction>> GetUserTransactionsAsync(
             Guid idAccount,
             string sortOrder,
-            int amountOfElementsToReturn)
+            int pageSize,
+            int pageNumber) // todo: add filter object
         {
             try
             {
-                var nameSortParametr = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+                var nameSortParametr = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
                 var dateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+                // todo: filter on transaction history
                 var listOfUserTransactionsToReturn = await _transactionHistoryService.GetAllAsync(idAccount);
+
+                // todo: add enum SortDirection (Ascending, Descending)
+                // todo: add enum SortField
 
                 switch (sortOrder)
                 {
@@ -145,9 +166,9 @@ namespace AccountingNotebook.Service.TransactionService
                         break;
                 }
 
-                if (amountOfElementsToReturn > 0)
+                if (pageSize > 0)
                 {
-                    return listOfUserTransactionsToReturn.Take(amountOfElementsToReturn).ToList();
+                    return listOfUserTransactionsToReturn.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
                 }
 
                 return listOfUserTransactionsToReturn.ToList();
@@ -155,7 +176,9 @@ namespace AccountingNotebook.Service.TransactionService
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                return;///////???????????????????????????????
+                
+                // todo: correct
+                throw;
             }
         }
     }

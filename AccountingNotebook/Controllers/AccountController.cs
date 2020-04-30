@@ -38,6 +38,7 @@ namespace AccountingNotebook.Controllers
                     return BadRequest("Entered information is incorrect");
                 }
 
+                // todo: move to var
                 if (await _transactionsService.GetUserTransactionsAsync(accountId, sortParam, amountOfElements) == null)
                 {
                     return NotFound($"Transaction with id {transactionId} for account with id {accountId} is not found");
@@ -47,6 +48,7 @@ namespace AccountingNotebook.Controllers
             }
             catch (Exception ex)
             {
+                // todo: do validation in body ;)
                 if(accountId == null)
                 {
                     _logger.LogInformation($"Account with id {accountId} returned null reference: {ex.Message}", ex);

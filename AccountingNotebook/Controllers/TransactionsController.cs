@@ -1,4 +1,4 @@
-﻿using AccountingNotebook.Abstractions;
+using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -80,6 +80,7 @@ namespace AccountingNotebook.Controllers
                     return BadRequest("Entered information is incorrect");
                 }
 
+                // todo: fix
                 if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
                     await _accountService.GetAccountByIdAsync(accountFromId) == null)
                 {

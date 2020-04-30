@@ -13,6 +13,7 @@ namespace AccountingNotebook.Service.AccountService
     {
         private readonly ConcurrentBag<Account> _accounts = new ConcurrentBag<Account>();
 
+        // todo: remove it
         public IEnumerable<Account> Accounts
         {
             get { return _accounts; }

@@ -12,6 +12,7 @@ namespace AccountingNotebook.Abstractions
         /// <param name="accountId">It is an id of accont we want see infomation about</param>
         Task<Account> GetAccountByIdAsync(Guid accountId);
         Task AddNewAccountAsync(Account account);
+        // todo: return remove :)
         Task UpdateAccountBalanceAsync(Guid accountId, decimal balance);
     }
 }

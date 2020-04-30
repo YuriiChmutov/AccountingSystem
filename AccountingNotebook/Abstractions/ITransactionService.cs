@@ -18,6 +18,7 @@ namespace AccountingNotebook.Abstractions
         Task DebitAsync(Guid idAccountFrom, Guid idAccountTo,
             decimal amount, string transactionDescription,
             TypeOfTransaction typeOfTransaction = TypeOfTransaction.Debit);
+        // todo: remove type
         Task CreditAsync(Guid idAccountFrom, Guid idAccountTo,
             decimal amount, string transactionDescription,
             TypeOfTransaction typeOfTransaction = TypeOfTransaction.Credit);

@@ -16,14 +16,17 @@ namespace AccountingNotebook.Service.TransactionHistoryService
         {
             var transaction = _transactions
                 .Where(t => (t.ToAccountId == accountId || t.FromAccountId == accountId) && 
-                            t.TransactionId == transactionId);
-            return Task.FromResult(transaction.FirstOrDefault());
+                            t.TransactionId == transactionId)
+                .FirstOrDefault();
+
+            return Task.FromResult(transaction);
         }
 
         public Task<IEnumerable<Transaction>> GetAllAsync(Guid accountId)
         {
             var transactions = _transactions
                 .Where(t => t.FromAccountId == accountId || t.ToAccountId == accountId);
+
             return Task.FromResult(transactions.AsEnumerable());
         }
 
