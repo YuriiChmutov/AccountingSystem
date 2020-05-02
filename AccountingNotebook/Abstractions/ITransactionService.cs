@@ -16,12 +16,10 @@ namespace AccountingNotebook.Abstractions
         /// <param name="amount">Amount of money which figurate in the transaction</param>
         /// <param name="transactionDescription">String description of transaction</param>
         Task DebitAsync(Guid idAccountFrom, Guid idAccountTo,
-            decimal amount, string transactionDescription,
-            TypeOfTransaction typeOfTransaction = TypeOfTransaction.Debit);
-        // todo: remove type
+            decimal amount, string transactionDescription);
         Task CreditAsync(Guid idAccountFrom, Guid idAccountTo,
-            decimal amount, string transactionDescription,
-            TypeOfTransaction typeOfTransaction = TypeOfTransaction.Credit);
-        Task<List<Transaction>> GetUserTransactionsAsync(Guid idAccount, string sortOrder, int amountOfElementsToReturn);
+            decimal amount, string transactionDescription);
+        Task<List<Transaction>> GetUserTransactionsAsync(Guid idAccount,
+            SortField sortOrder, SortDirection sortDirection, int pageSize, int pageNumber);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AccountingNotebook.Abstractions;
+using AccountingNotebook.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -28,8 +29,10 @@ namespace AccountingNotebook.Controllers
         public async Task<IActionResult> GetTransactionsAsync(
             Guid accountId,
             Guid transactionId,
-            string sortParam,
-            int amountOfElements)
+            SortField sortField,
+            SortDirection sortDirection,
+            int pageSize,
+            int pageNumber)
         {
             try
             {
@@ -38,27 +41,29 @@ namespace AccountingNotebook.Controllers
                     return BadRequest("Entered information is incorrect");
                 }
 
-                // todo: move to var
-                if (await _transactionsService.GetUserTransactionsAsync(accountId, sortParam, amountOfElements) == null)
+                if (accountId == null)
+                {
+                    throw new ArgumentNullException($"{accountId} has null reference");
+                }
+
+                if (transactionId == null)
+                {
+                    throw new ArgumentNullException($"{transactionId} has null reference");
+                }
+
+                var userTransactions = await _transactionsService.GetUserTransactionsAsync(
+                accountId, sortField, sortDirection, pageSize, pageNumber);
+
+                if (userTransactions == null)
                 {
                     return NotFound($"Transaction with id {transactionId} for account with id {accountId} is not found");
                 }
 
-                return Ok(await _transactionsService.GetUserTransactionsAsync(accountId, sortParam, amountOfElements));
+                return Ok(userTransactions);
             }
             catch (Exception ex)
             {
-                // todo: do validation in body ;)
-                if(accountId == null)
-                {
-                    _logger.LogInformation($"Account with id {accountId} returned null reference: {ex.Message}", ex);
-                }
-
-                if(transactionId == null)
-                {
-                    _logger.LogInformation($"Transaction with id {transactionId} returned null reference: {ex.Message}", ex);
-                }
-
+                _logger.LogInformation($"Method returned null reference: {ex.Message}", ex);
                 return StatusCode(500, "A problem happened while handing your request");
             }
         }
@@ -66,8 +71,10 @@ namespace AccountingNotebook.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTransactionHistoryAsync(
             Guid accountId,
-            string sortParam,
-            int amountOfTransactions)
+            SortField sortField,
+            SortDirection sortDirection,
+            int pageSize,
+            int pageNumber)
         {
             try
             {
@@ -81,7 +88,8 @@ namespace AccountingNotebook.Controllers
                     return NotFound($"User with id {accountId} is not found");
                 }
 
-                return Ok(await _transactionsService.GetUserTransactionsAsync(accountId, sortParam, amountOfTransactions));
+                return Ok(await _transactionsService.GetUserTransactionsAsync(
+                    accountId, sortField, sortDirection, pageSize, pageNumber));
             }
             catch (Exception ex)
             {

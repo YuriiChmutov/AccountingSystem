@@ -50,7 +50,7 @@ namespace AccountingNotebook.Controllers
 
                 // todo: add unit tests :) mstest
                 await _transactionsService.CreditAsync(accountFromId, accountToId,
-                    transaction.Amount, transaction.TransactionDescription, transaction.Type);
+                    transaction.Amount, transaction.TransactionDescription);
                 
                 return Ok(transaction.TransactionId);
             }
@@ -80,11 +80,14 @@ namespace AccountingNotebook.Controllers
                     return BadRequest("Entered information is incorrect");
                 }
 
-                // todo: fix
-                if (await _accountService.GetAccountByIdAsync(accountToId) == null ||
-                    await _accountService.GetAccountByIdAsync(accountFromId) == null)
+                if(await _accountService.GetAccountByIdAsync(accountToId) == null)
                 {
-                    return NotFound($"Accounts with id {accountToId} or {accountFromId} don't exist");
+                    return NotFound($"Account with id {accountToId} doesn't exist");
+                }
+
+                if (await _accountService.GetAccountByIdAsync(accountFromId) == null)
+                {
+                    return NotFound($"Account with id {accountFromId} doesn't exist");
                 }
 
                 await _transactionsService.DebitAsync(accountFromId, accountToId,

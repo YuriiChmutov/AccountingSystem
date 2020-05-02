@@ -24,7 +24,7 @@ namespace AccountingNotebook
                 .AddJsonFormatters();
 
             services.AddSingleton<ITransactionService, TransactionService>();
-            services.AddSingleton<IAccountService, AccountService>();
+            services.AddSingleton<IAccountService, InMemoryAccountService>();
             services.AddSingleton<ITransactionHistoryService<Transaction>, TransactionsHistoryService>();
         }
         

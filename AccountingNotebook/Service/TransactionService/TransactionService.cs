@@ -14,9 +14,8 @@ namespace AccountingNotebook.Service.TransactionService
         private readonly IAccountService _accountService;
         private readonly ILogger<TransactionService> _logger;
         private readonly ITransactionHistoryService<Transaction> _transactionHistoryService;
-        private readonly static Mutex mutex = new Mutex(false, "MyMutex");
+        private readonly static SemaphoreSlim semaphore = new SemaphoreSlim(1);
 
-        // todo: add logging and logger to all services
         public TransactionService(ILogger<TransactionService> logger,
             IAccountService accountService,
             ITransactionHistoryService<Transaction> transactionHistoryService)
@@ -40,8 +39,7 @@ namespace AccountingNotebook.Service.TransactionService
             Guid accountFromId,
             Guid accountToId,
             decimal amount,
-            string transactionDescription,
-            TypeOfTransaction typeOfTransaction = TypeOfTransaction.Credit)
+            string transactionDescription)
         {
             var isFundsWereTransferedSuccessfully = false;
             var balanceBeforeTransfer = 0m;
@@ -49,15 +47,15 @@ namespace AccountingNotebook.Service.TransactionService
             try
             {
                 var accountFrom = await _accountService.GetAccountByIdAsync(accountFromId);
-                // todo: check if null here
+
+                if(accountFrom == null)
+                {
+                    throw new Exception($"Accont with id {accountFrom.AccountId} returned null reference");
+                }
+
                 balanceBeforeTransfer = accountFrom.Balance;
 
-                // todo: exception handling
-                // todo: maybe slim? I believe we don't need a kernel-mode
-                mutex.WaitOne();
-
-                // todo: add pretty thing:
-                // MyMutex.RunSingleThread(() => { })
+                semaphore.Wait();
 
                 if (accountFrom.Balance - amount < 0)
                 {
@@ -68,11 +66,12 @@ namespace AccountingNotebook.Service.TransactionService
 
                 isFundsWereTransferedSuccessfully = true;
 
-                var transaction = CreateTransaction(typeOfTransaction, accountFromId, accountToId, transactionDescription, amount);
+                var transaction = CreateTransaction(TypeOfTransaction.Credit,
+                    accountFromId, accountToId, transactionDescription, amount);
 
                 await _transactionHistoryService.AddAsync(transaction);
 
-                mutex.ReleaseMutex();
+                semaphore.Release();
             }
             catch (Exception ex)
             {
@@ -81,18 +80,7 @@ namespace AccountingNotebook.Service.TransactionService
                     await _accountService.UpdateAccountBalanceAsync(accountFromId, balanceBeforeTransfer);
                 }
 
-                //if(accountFromId == null)
-                //{
-                //    _logger.LogInformation($"Account with id {accountFromId} returned null reference: {ex.Message}");
-                //}
-                //else if(accountToId == null)
-                //{
-                //    _logger.LogInformation($"Account with id {accountToId} returned null reference: {ex.Message}");
-                //}
-                //else
-                //{
-                //    _logger.LogInformation(ex.Message);
-                //}
+                _logger.LogInformation($"{ex.Message}");
             }
         }
 
@@ -100,70 +88,77 @@ namespace AccountingNotebook.Service.TransactionService
             Guid accountFromId,
             Guid accountToId,
             decimal amount,
-            string transactionDescription,
-            TypeOfTransaction typeOfTransaction = TypeOfTransaction.Debit)
+            string transactionDescription)
         {
+            var isFundsWereTransferedSuccessfully = false;
+            var balanceBeforeTransfer = 0m;
+
             try
             {
                 var accountTo = await _accountService.GetAccountByIdAsync(accountToId);
 
+                if (accountTo == null)
+                {
+                    throw new Exception($"Accont with id {accountTo.AccountId} returned null reference");
+                }
+
+                balanceBeforeTransfer = accountTo.Balance;
+
+                semaphore.Wait();
+
                 await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
 
+                isFundsWereTransferedSuccessfully = true;
+
                 var transaction = CreateTransaction(
-                    typeOfTransaction,
+                    TypeOfTransaction.Debit,
                     accountFromId,
                     accountToId,
                     transactionDescription,
                     amount);
+
                 await _transactionHistoryService.AddAsync(transaction);
+                semaphore.Release();
             }
             catch (Exception ex)
             {
-                if (accountFromId == null)
+                if (isFundsWereTransferedSuccessfully)
                 {
-                    _logger.LogInformation($"Account with id {accountFromId} returned null reference: {ex.Message}");
+                    await _accountService.UpdateAccountBalanceAsync(accountToId, balanceBeforeTransfer);
                 }
-                else if (accountToId == null)
-                {
-                    _logger.LogInformation($"Account with id {accountToId} returned null reference: {ex.Message}");
-                }
-                else
-                {
-                    _logger.LogInformation(ex.Message);
-                }
+                _logger.LogInformation(ex.Message);
             }
         }
 
         public async Task<List<Transaction>> GetUserTransactionsAsync(
             Guid idAccount,
-            string sortOrder,
+            SortField sortField,
+            SortDirection sortDirection,
             int pageSize,
             int pageNumber) // todo: add filter object
         {
             try
             {
-                var nameSortParametr = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-                var dateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
-                // todo: filter on transaction history
                 var listOfUserTransactionsToReturn = await _transactionHistoryService.GetAllAsync(idAccount);
 
-                // todo: add enum SortDirection (Ascending, Descending)
-                // todo: add enum SortField
-
-                switch (sortOrder)
+                if(sortField == SortField.Name && sortDirection == SortDirection.Descending)
                 {
-                    case "name_desc":
-                        listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.TransactionId);
-                        break;
-                    case "Date":
-                        listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.Timestamp);
-                        break;
-                    case "date_desc":
-                        listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.Timestamp);
-                        break;
-                    default:
-                        listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.TransactionId);
-                        break;
+                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.TransactionId);
+                }
+
+                if (sortField == SortField.Name && sortDirection == SortDirection.Ascending)
+                {
+                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.TransactionId);
+                }
+
+                if(sortField == SortField.Date && sortDirection == SortDirection.Ascending)
+                {
+                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.Timestamp);
+                }
+
+                if(sortField == SortField.Date && sortDirection == SortDirection.Descending)
+                {
+                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.Timestamp);
                 }
 
                 if (pageSize > 0)
@@ -176,9 +171,7 @@ namespace AccountingNotebook.Service.TransactionService
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                
-                // todo: correct
-                throw;
+                throw new Exception($"{ex.Message}");
             }
         }
     }
