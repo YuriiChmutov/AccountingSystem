@@ -32,7 +32,12 @@ namespace AccountingNotebook.Service.TransactionService
             string description,
             decimal amount)
         {
-            return new Transaction(typeOfTransaction, idAccountFrom, idAccountTo, description, amount);
+            return new Transaction(
+                typeOfTransaction,
+                idAccountFrom,
+                idAccountTo,
+                description,
+                amount);
         }
 
         public async Task CreditAsync(
@@ -48,9 +53,9 @@ namespace AccountingNotebook.Service.TransactionService
             {
                 var accountFrom = await _accountService.GetAccountByIdAsync(accountFromId);
 
-                if(accountFrom == null)
+                if (accountFrom == null)
                 {
-                    throw new Exception($"Accont with id {accountFrom.AccountId} returned null reference");
+                    throw new Exception($"Account with id {accountFrom.AccountId} returned null reference");
                 }
 
                 balanceBeforeTransfer = accountFrom.Balance;
@@ -62,12 +67,18 @@ namespace AccountingNotebook.Service.TransactionService
                     throw new Exception("Not enough funds in the account!");
                 }
 
-                await _accountService.UpdateAccountBalanceAsync(accountFromId, accountFrom.Balance - amount);
+                await _accountService.UpdateAccountBalanceAsync(
+                    accountFromId,
+                    accountFrom.Balance - amount);
 
                 isFundsWereTransferedSuccessfully = true;
 
-                var transaction = CreateTransaction(TypeOfTransaction.Credit,
-                    accountFromId, accountToId, transactionDescription, amount);
+                var transaction = CreateTransaction(
+                    TypeOfTransaction.Credit,
+                    accountFromId,
+                    accountToId,
+                    transactionDescription,
+                    amount);
 
                 await _transactionHistoryService.AddAsync(transaction);
 
@@ -80,7 +91,8 @@ namespace AccountingNotebook.Service.TransactionService
                     await _accountService.UpdateAccountBalanceAsync(accountFromId, balanceBeforeTransfer);
                 }
 
-                _logger.LogInformation($"{ex.Message}");
+                // todo: add more details to logs
+                _logger.LogInformation($"Credit operation failed for account {accountFromId}. Message: {ex.Message}");
             }
         }
 
@@ -104,6 +116,7 @@ namespace AccountingNotebook.Service.TransactionService
 
                 balanceBeforeTransfer = accountTo.Balance;
 
+                // todo: check if we can use some params and we need it
                 semaphore.Wait();
 
                 await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
@@ -126,7 +139,9 @@ namespace AccountingNotebook.Service.TransactionService
                 {
                     await _accountService.UpdateAccountBalanceAsync(accountToId, balanceBeforeTransfer);
                 }
+
                 _logger.LogInformation(ex.Message);
+                // todo: add throw or other exception
             }
         }
 
@@ -139,6 +154,7 @@ namespace AccountingNotebook.Service.TransactionService
         {
             try
             {
+                // todo: move to history service
                 var listOfUserTransactionsToReturn = await _transactionHistoryService.GetAllAsync(idAccount);
 
                 if(sortField == SortField.Name && sortDirection == SortDirection.Descending)
@@ -171,7 +187,7 @@ namespace AccountingNotebook.Service.TransactionService
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
-                throw new Exception($"{ex.Message}");
+                throw;
             }
         }
     }

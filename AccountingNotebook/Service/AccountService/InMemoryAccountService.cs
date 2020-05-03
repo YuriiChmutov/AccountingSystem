@@ -25,6 +25,7 @@ namespace AccountingNotebook.Service.AccountService
 
         public Task DeleteAccountAsync(Account account)
         {
+            // todo: fix
             {
                 _accounts.ToList().Remove(account);
                 return Task.CompletedTask;

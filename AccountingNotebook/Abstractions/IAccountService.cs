@@ -6,6 +6,7 @@ namespace AccountingNotebook.Abstractions
 {
     public interface IAccountService
     {
+        // todo: fix docs in all interfaces
         /// <summary>
         /// It is an interface which responsible for account's behavior.
         /// </summary>
