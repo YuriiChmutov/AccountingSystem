@@ -20,7 +20,8 @@ namespace AccountingNotebook
         
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore()
+            services
+                .AddMvcCore()
                 .AddJsonFormatters();
 
             services.AddSingleton<ITransactionService, TransactionService>();

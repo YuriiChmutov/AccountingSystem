@@ -1,5 +1,6 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
+using AccountingNotebook.Utils;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -60,6 +61,7 @@ namespace AccountingNotebook.Service.TransactionService
 
                 balanceBeforeTransfer = accountFrom.Balance;
 
+                // todo: extension method
                 semaphore.Wait();
 
                 if (accountFrom.Balance - amount < 0)
@@ -159,12 +161,14 @@ namespace AccountingNotebook.Service.TransactionService
             try
             {
                 var listOfUserTransactionsToReturn = 
-                    await _transactionHistoryService.GetAllTransactionsAsync(
-                        idAccount,
-                        sortField,
-                        sortDirection,
-                        pageSize,
-                        pageNumber);
+                    await _transactionHistoryService.GetAllTransactionsAsync(new TransactionsFilter
+                    {
+                        PageNumber = pageNumber,
+                        PageSize = pageNumber,
+                        SortDirection = sortDirection,
+                        SortField = sortField,
+                        AccountId = idAccount
+                    });
 
                 return listOfUserTransactionsToReturn.ToList();
             }

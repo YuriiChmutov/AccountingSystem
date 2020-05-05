@@ -16,12 +16,7 @@ namespace AccountingNotebook.Abstractions
         /// </summary>
         /// <param name="accountId">It is an id of account we want see transactions</param>
         /// <returns>List of user`s transactions</returns>
-        Task<IEnumerable<T>> GetAllTransactionsAsync(
-            Guid accountId,
-            SortField sortField,
-            SortDirection sortDirection,
-            int pageSize,
-            int pageNumber);
+        Task<IEnumerable<T>> GetAllTransactionsAsync(TransactionsFilter filter);
 
         /// <summary>
         /// Method which give transaction of account

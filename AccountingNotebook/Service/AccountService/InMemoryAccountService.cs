@@ -9,6 +9,7 @@ namespace AccountingNotebook.Service.AccountService
 {
     public class InMemoryAccountService: IAccountService
     {
+        // ???? concurrentDictionary
         private readonly List<Account> _accounts = new List<Account>();
         
         public Task<Account> GetAccountByIdAsync(Guid id)
@@ -25,10 +26,8 @@ namespace AccountingNotebook.Service.AccountService
 
         public Task DeleteAccountAsync(Account account)
         {
-            {
-                _accounts.Remove(account);                
-                return Task.CompletedTask;
-            }
+            _accounts.Remove(account);                
+            return Task.CompletedTask;
         }
 
         public Task UpdateAccountBalanceAsync(Guid accountId, decimal balance)

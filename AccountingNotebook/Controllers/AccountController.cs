@@ -36,6 +36,7 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
+                // todo: add default values
                 if (!ModelState.IsValid)
                 {
                     return BadRequest("Entered information is incorrect");
@@ -52,7 +53,11 @@ namespace AccountingNotebook.Controllers
                 }
 
                 var userTransactions = await _transactionsService.GetUserTransactionsAsync(
-                accountId, sortField, sortDirection, pageSize, pageNumber);
+                    accountId,
+                    sortField,
+                    sortDirection,
+                    pageSize,
+                    pageNumber);
 
                 if (userTransactions == null)
                 {

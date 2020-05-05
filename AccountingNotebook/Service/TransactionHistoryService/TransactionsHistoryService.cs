@@ -22,25 +22,13 @@ namespace AccountingNotebook.Service.TransactionHistoryService
             return Task.FromResult(transaction);
         }
 
-        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync(
-            Guid accountId,
-            SortField sortField,
-            SortDirection sortDirection,
-            int pageSize,
-            int pageNumber)
+        public Task<IEnumerable<Transaction>> GetAllTransactionsAsync(TransactionsFilter filter)
         {
             var transactions = _transactions
-                .Where(t => t.FromAccountId == accountId || t.ToAccountId == accountId);
+                .Where(t => t.FromAccountId == filter.AccountId || t.ToAccountId == filter.AccountId);
 
-            transactions = FilterTransactions(
-                transactions,
-                new TransactionsFilter
-                {
-                    SortField = sortField,
-                    SortDirection = sortDirection,
-                    PageNumber = pageNumber,
-                    PageSize = pageSize
-                });
+            // todo: maybe some filter that would be frequently usable
+            transactions = FilterTransactions(transactions, filter);
 
             return Task.FromResult(transactions.AsEnumerable());
         }
@@ -48,15 +36,20 @@ namespace AccountingNotebook.Service.TransactionHistoryService
         public IEnumerable<Transaction> FilterTransactions(
             IEnumerable<Transaction> collection,
             TransactionsFilter filter)
-        {//глянуть внизу файла
-            if(filter.SortField == SortField.Name && filter.SortDirection == SortDirection.Descending)
-            {
-                collection = collection.OrderByDescending(t => t.TransactionId);
-            }
+        {
+            IEnumerable<Transaction> result = collection;
 
-            if (filter.SortField == SortField.Name && filter.SortDirection == SortDirection.Ascending)
+            // todo: add all or left date only
+            if (filter.SortField == SortField.Name)
             {
-                collection = collection.OrderBy(t => t.TransactionId);
+                if (filter.SortDirection == SortDirection.Descending)
+                {
+                    result = result.OrderByDescending(t => t.TransactionId);
+                }
+                else
+                {
+                    result = result.OrderBy(t => t.TransactionId);
+                }
             }
 
             if (filter.SortField == SortField.Date && filter.SortDirection == SortDirection.Ascending)
@@ -68,14 +61,11 @@ namespace AccountingNotebook.Service.TransactionHistoryService
             {
                 collection = collection.OrderByDescending(t => t.Timestamp);
             }
-
-            if (filter.PageSize > 0)
-            {
-                return collection.Skip((filter.PageNumber - 1) * filter.PageSize)
-                                 .Take(filter.PageSize).ToList();
-            }
-
-            return collection;
+                
+            return result
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToList();
         }
 
         public Task AddAsync(Transaction transaction)
@@ -85,32 +75,3 @@ namespace AccountingNotebook.Service.TransactionHistoryService
         }
     }
 }
-
-
-            //string parametr = null;
-            //switch (filter.SortField)
-            //{
-            //    case SortField.Name:
-            //        collection = collection.OrderBy(t => t.TransactionId);
-            //        parametr = "name";
-            //        break;
-            //    case SortField.Date:
-            //        collection = collection.OrderBy(t => t.Timestamp);
-            //        parametr = "date";
-            //        break;
-            //    default:
-            //        collection = collection.OrderByDescending(t => t.Timestamp);
-            //        parametr = String.Empty;
-            //        break;
-            //}
-
-            //switch (filter.SortDirection)
-            //{
-            //    case SortDirection.Ascending:
-            //        collection.OrderBy(c => c.)
-            //        break;
-            //    case SortDirection.Descending:
-            //        break;
-            //    default:
-            //        break;
-            //}
