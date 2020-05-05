@@ -1,7 +1,7 @@
 ﻿using AccountingNotebook.Abstractions;
 using AccountingNotebook.Models;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,7 +9,7 @@ namespace AccountingNotebook.Service.AccountService
 {
     public class InMemoryAccountService: IAccountService
     {
-        private readonly ConcurrentBag<Account> _accounts = new ConcurrentBag<Account>();
+        private readonly List<Account> _accounts = new List<Account>();
         
         public Task<Account> GetAccountByIdAsync(Guid id)
         {
@@ -25,9 +25,8 @@ namespace AccountingNotebook.Service.AccountService
 
         public Task DeleteAccountAsync(Account account)
         {
-            // todo: fix
             {
-                _accounts.ToList().Remove(account);
+                _accounts.Remove(account);                
                 return Task.CompletedTask;
             }
         }

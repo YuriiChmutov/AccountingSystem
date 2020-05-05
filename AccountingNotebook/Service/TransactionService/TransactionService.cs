@@ -91,8 +91,10 @@ namespace AccountingNotebook.Service.TransactionService
                     await _accountService.UpdateAccountBalanceAsync(accountFromId, balanceBeforeTransfer);
                 }
 
-                // todo: add more details to logs
-                _logger.LogInformation($"Credit operation failed for account {accountFromId}. Message: {ex.Message}");
+                _logger.LogInformation($"Credit operation failed for account {accountFromId}." +
+                    $" Message: {ex.Message}." +
+                    $" Date and time: {DateTime.UtcNow}");
+                throw new Exception("An error occurred, but the balance returned to its original state");
             }
         }
 
@@ -116,7 +118,7 @@ namespace AccountingNotebook.Service.TransactionService
 
                 balanceBeforeTransfer = accountTo.Balance;
 
-                // todo: check if we can use some params and we need it
+                // todo: check if we can use some params and we need it (done, i can leave it)
                 semaphore.Wait();
 
                 await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
@@ -140,8 +142,10 @@ namespace AccountingNotebook.Service.TransactionService
                     await _accountService.UpdateAccountBalanceAsync(accountToId, balanceBeforeTransfer);
                 }
 
-                _logger.LogInformation(ex.Message);
-                // todo: add throw or other exception
+                _logger.LogInformation($"Debit operation failed for account {accountFromId}." +
+                    $" Message: {ex.Message}." +
+                    $" Date and time: {DateTime.UtcNow}");
+                throw new Exception("An error occurred, but the balance returned to its original state");
             }
         }
 
@@ -150,43 +154,25 @@ namespace AccountingNotebook.Service.TransactionService
             SortField sortField,
             SortDirection sortDirection,
             int pageSize,
-            int pageNumber) // todo: add filter object
+            int pageNumber)
         {
             try
             {
-                // todo: move to history service
-                var listOfUserTransactionsToReturn = await _transactionHistoryService.GetAllAsync(idAccount);
-
-                if(sortField == SortField.Name && sortDirection == SortDirection.Descending)
-                {
-                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.TransactionId);
-                }
-
-                if (sortField == SortField.Name && sortDirection == SortDirection.Ascending)
-                {
-                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.TransactionId);
-                }
-
-                if(sortField == SortField.Date && sortDirection == SortDirection.Ascending)
-                {
-                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderBy(t => t.Timestamp);
-                }
-
-                if(sortField == SortField.Date && sortDirection == SortDirection.Descending)
-                {
-                    listOfUserTransactionsToReturn = listOfUserTransactionsToReturn.OrderByDescending(t => t.Timestamp);
-                }
-
-                if (pageSize > 0)
-                {
-                    return listOfUserTransactionsToReturn.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-                }
+                var listOfUserTransactionsToReturn = 
+                    await _transactionHistoryService.GetAllTransactionsAsync(
+                        idAccount,
+                        sortField,
+                        sortDirection,
+                        pageSize,
+                        pageNumber);
 
                 return listOfUserTransactionsToReturn.ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogInformation(ex.Message);
+                _logger.LogInformation($"GetUserTransactionsAsync operation failed for account {idAccount}." +
+                    $" Message: {ex.Message}." +
+                    $" Date and time: {DateTime.UtcNow}");
                 throw;
             }
         }
