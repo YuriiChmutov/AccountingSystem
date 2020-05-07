@@ -264,27 +264,17 @@ namespace AccountingNotebook.Service.TransactionHistoryService
 
             switch (filter.SortDirection)
             {
-                case SortDirection.Ascending:
-                    if (filter.SortField == SortField.Date)
-                    {
-                        result = result.OrderBy(x => x.Timestamp);
-                    }
-
-                    if (filter.SortField == SortField.Price)
-                    {
-                        result = result.OrderBy(x => x.Amount);
-                    }
+                case SortDirection.Ascending when filter.SortField == SortField.Date:
+                    result = result.OrderBy(x => x.Timestamp);
                     break;
-                case SortDirection.Descending:
-                    if (filter.SortField == SortField.Date)
-                    {
-                        result = result.OrderByDescending(x => x.Timestamp);
-                    }
-
-                    if (filter.SortField == SortField.Price)
-                    {
-                        result = result.OrderByDescending(x => x.Amount);
-                    }
+                case SortDirection.Descending when filter.SortField == SortField.Date:
+                    result = result.OrderByDescending(x => x.Timestamp);
+                    break;
+                case SortDirection.Ascending when filter.SortField == SortField.Price:
+                    result = result.OrderBy(x => x.Amount);
+                    break;
+                case SortDirection.Descending when filter.SortField == SortField.Price:
+                    result = result.OrderByDescending(x => x.Amount);
                     break;
                 case SortDirection.None:
                 default:
