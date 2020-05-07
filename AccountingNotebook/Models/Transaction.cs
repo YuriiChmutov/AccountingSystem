@@ -5,17 +5,21 @@ namespace AccountingNotebook.Models
 {
     public class Transaction
     {
-        public TypeOfTransaction Type { get; set; }
-        public Guid ToAccountId { get; set; }
-        public Guid FromAccountId { get; set; }
-        public Guid TransactionId { get; set; }
-        public string TransactionDescription { get; set; }
-        public decimal Amount { get; set; }
-        public long Timestamp { get; set; }
+        public TypeOfTransaction Type { get; set; } = TypeOfTransaction.Credit;
+        public Guid ToAccountId { get; set; } = new Guid();
+        public Guid FromAccountId { get; set; } = new Guid();
+        public Guid TransactionId { get; set; } = new Guid();
+        public string TransactionDescription { get; set; } = "Transaction's description";
+        public decimal Amount { get; set; } = 0;
+        public long Timestamp { get; set; } = DateTime.UtcNow.ConvertToUnixTimestamp();
         
 
-        public Transaction(TypeOfTransaction typeOfTransaction, Guid idAccountFrom, Guid idAccountTo,
-            string _description, decimal _amount)
+        public Transaction(
+            TypeOfTransaction typeOfTransaction,
+            Guid idAccountFrom,
+            Guid idAccountTo,
+            string _description,
+            decimal _amount)
         {
             this.Type = typeOfTransaction;
             this.FromAccountId = idAccountFrom;

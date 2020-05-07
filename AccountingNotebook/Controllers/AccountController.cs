@@ -36,7 +36,6 @@ namespace AccountingNotebook.Controllers
         {
             try
             {
-                // todo: add default values
                 if (!ModelState.IsValid)
                 {
                     return BadRequest("Entered information is incorrect");

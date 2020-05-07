@@ -61,7 +61,7 @@ namespace AccountingNotebook.Service.TransactionService
 
                 balanceBeforeTransfer = accountFrom.Balance;
 
-                // todo: extension method
+                // todo: extension method (I DONT КНОУ)
                 semaphore.Wait();
 
                 if (accountFrom.Balance - amount < 0)
@@ -119,8 +119,7 @@ namespace AccountingNotebook.Service.TransactionService
                 }
 
                 balanceBeforeTransfer = accountTo.Balance;
-
-                // todo: check if we can use some params and we need it (done, i can leave it)
+                
                 semaphore.Wait();
 
                 await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
