@@ -222,6 +222,81 @@ namespace AccountingNotebook.Service.TransactionHistoryService
                 .ToList();
         }
 
+        public IEnumerable<Transaction> FilterTransactions2(
+            IEnumerable<Transaction> collection,
+            TransactionsFilter2 filter)
+        {
+            IEnumerable<Transaction> result = collection;
+
+            if (filter.Price.HasValue)
+            {
+                result = result.Where(x => x.Amount == filter.Price);
+            }
+            else
+            {
+                if (filter.FromPrice.HasValue)
+                {
+                    result = result.Where(x => x.Amount >= filter.Price);
+                }
+
+                if (filter.ToPrice.HasValue)
+                {
+                    result = result.Where(x => x.Amount < filter.Price);
+                }
+            }
+
+            if (filter.Timestamp.HasValue)
+            {
+                result = result.Where(x => x.Timestamp == filter.Timestamp);
+            }
+            else
+            {
+                if (filter.FromTimestamp.HasValue)
+                {
+                    result = result.Where(x => x.Timestamp >= filter.Timestamp);
+                }
+
+                if (filter.ToTimestamp.HasValue)
+                {
+                    result = result.Where(x => x.Timestamp < filter.Timestamp);
+                }
+            }
+
+            switch (filter.SortDirection)
+            {
+                case SortDirection.Ascending:
+                    if (filter.SortField == SortField.Date)
+                    {
+                        result = result.OrderBy(x => x.Timestamp);
+                    }
+
+                    if (filter.SortField == SortField.Price)
+                    {
+                        result = result.OrderBy(x => x.Amount);
+                    }
+                    break;
+                case SortDirection.Descending:
+                    if (filter.SortField == SortField.Date)
+                    {
+                        result = result.OrderByDescending(x => x.Timestamp);
+                    }
+
+                    if (filter.SortField == SortField.Price)
+                    {
+                        result = result.OrderByDescending(x => x.Amount);
+                    }
+                    break;
+                case SortDirection.None:
+                default:
+                    break;
+            }
+
+            return result
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToList();
+        }
+
         public Task AddAsync(Transaction transaction)
         {
             _transactions.Add(transaction);

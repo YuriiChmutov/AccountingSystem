@@ -119,22 +119,22 @@ namespace AccountingNotebook.Service.TransactionService
                 }
 
                 balanceBeforeTransfer = accountTo.Balance;
-                
-                semaphore.Wait();
 
-                await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
+                await semaphore.RunAsync(async () =>
+                {
+                    await _accountService.UpdateAccountBalanceAsync(accountToId, accountTo.Balance + amount);
 
-                isFundsWereTransferedSuccessfully = true;
+                    isFundsWereTransferedSuccessfully = true;
 
-                var transaction = CreateTransaction(
-                    TypeOfTransaction.Debit,
-                    accountFromId,
-                    accountToId,
-                    transactionDescription,
-                    amount);
+                    var transaction = CreateTransaction(
+                        TypeOfTransaction.Debit,
+                        accountFromId,
+                        accountToId,
+                        transactionDescription,
+                        amount);
 
-                await _transactionHistoryService.AddAsync(transaction);
-                semaphore.Release();
+                    await _transactionHistoryService.AddAsync(transaction);
+                }, CancellationToken.None);
             }
             catch (Exception ex)
             {
